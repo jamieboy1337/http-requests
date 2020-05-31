@@ -5,7 +5,7 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#define PORT 5000
+#define PORT 80
 
 int main(int argc, char** argv) {
   addrinfo hints;
@@ -16,47 +16,58 @@ int main(int argc, char** argv) {
   hints.ai_family = AF_UNSPEC;
   hints.ai_flags = AI_PASSIVE;
 
-  int success = getaddrinfo("localhost", NULL, &hints, &results);
+  int success = getaddrinfo("www.google.com", NULL, &hints, &results);
+
+  if (success != 0) {
+    std::cout << "oops" << std::endl;
+    exit(EXIT_FAILURE);
+  }
 
   char shitspace[128];
 
-  for (addrinfo* i = results; i != NULL; i = i->ai_next) {
-    if (i->ai_family == AF_INET) {
+  std::cout << results->ai_addr << std::endl;
+  std::cout << "money" << std::endl;
+
+  addrinfo* res = results;
+  for (res = results; res != NULL; res = res->ai_next) {
+    std::cout << "ok" << std::endl;
+    if (res->ai_family == AF_INET) {
       std::cout << "AF_INET" << std::endl;
-      sockaddr_in* addr = reinterpret_cast<sockaddr_in*>(i->ai_addr);
-      std::cout << inet_ntop(i->ai_family, (const void*)&addr->sin_addr, shitspace, 127) << std::endl;
+      sockaddr_in* addr = reinterpret_cast<sockaddr_in*>(res->ai_addr);
+      std::cout << inet_ntop(res->ai_family, (const void*)&addr->sin_addr, shitspace, 127) << std::endl;
       addr->sin_port = htons(PORT);
-    } else if (i->ai_family == AF_INET6) {
+    } else if (res->ai_family == AF_INET6) {
       std::cout << "AF_INET6" << std::endl;
-      sockaddr_in6* addr = reinterpret_cast<sockaddr_in6*>(i->ai_addr);
-      std::cout << inet_ntop(i->ai_family, (const void*)&addr->sin6_addr, shitspace, 127) << std::endl;
+      sockaddr_in6* addr = reinterpret_cast<sockaddr_in6*>(res->ai_addr);
+      std::cout << inet_ntop(res->ai_family, (const void*)&addr->sin6_addr, shitspace, 127) << std::endl;
       addr->sin6_port = htons(PORT);
     } else {
-      std::cout << "OTHER" << std::endl;
+      std::cout << "no dice" << std::endl;
       continue;
     }
 
-    sockaddr* addr = reinterpret_cast<sockaddr*>(i->ai_addr);
+    sockaddr* addr = reinterpret_cast<sockaddr*>(res->ai_addr);
+    std::cout << "getting ready" << std::endl;
     int fd = socket(addr->sa_family, SOCK_STREAM, 0);
     if (fd == -1) {
       std::cout << "bad socket" << std::endl;
-      exit(EXIT_FAILURE);
     }
 
-    int success = connect(fd, addr, i->ai_addrlen);
+    std::cout << "connecting " << std::endl;
+    int success = connect(fd, addr, res->ai_addrlen);
     if (success == -1) {
       std::cout << "bad connect" << std::endl;
       std::cout << errno << std::endl;
-      std::cout << EAGAIN << std::endl;
       close(fd);
-      exit(EXIT_FAILURE);
     }
 
 
 
     std::cout << "you're good" << std::endl;
 
-    write(fd, (void*)"hello moto\n", 11);
+    // write(fd, (void*)"hello moto\n", 11);
     close(fd);
   }
+
+  freeaddrinfo(results);
 }
