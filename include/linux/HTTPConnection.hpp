@@ -1,39 +1,7 @@
-#ifndef CONNECTION_H_
-#define CONNECTION_H_
-
-#include <string>
+#include "HTTPResponse.hpp"
 #include <functional>
-
 #include <unordered_map>
-
-/**
- *  All of the methods we support
- *  Look at that there's only one right now
- */ 
-enum HTTPMethod {
-  GET
-};
-
-class HTTPResponse {
- public:
-  // i dont know what we need yet lol
-
-  /**
-   *  Creates an HTTP response from a parsed response string.
-   */ 
-  HTTPResponse(std::string response);
-
-  /**
-   *  Fetch a header from the connection
-   */ 
-  std::string GetHeader(const std::string& key);
-  const std::string& GetBody();
-
- private:
-  std::unordered_map<std::string, std::string> headers_;
-  std::string body_;
-  HTTPMethod method_;
-};
+#include <thread>
 
 /**
  *  Represents a single connection instance between server and client
@@ -55,7 +23,7 @@ class HTTPConnection {
   /**
    *  Send a request to the specified domain name
    */ 
-  void send(const std::string& domain_name);
+  void Send(const std::string& domain_name);
 
   // probably spin up a thread for that, its an implementation detail though
 
@@ -65,6 +33,16 @@ class HTTPConnection {
    *  @param response_func - the function which is run once the response is received.
    */ 
   void SetResponseCallback(std::function<void(HTTPResponse)> response_func);
-};
 
-#endif // CONNECTION_H_
+ private:
+  std::unordered_map<std::string, std::string> headers_;
+  int socket_fd_;
+  std::thread socket_thread_;
+  std::function<void(HTTPResponse)> callback_;
+
+  /**
+   *  Attempt to connect to the given domain name.
+   *  Returns true if successful, false otherwise.
+   */ 
+  bool ConnectToServer(const std::string& domain_name);
+};

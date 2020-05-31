@@ -1,4 +1,4 @@
-#include "HTTPConnection.hpp"
+#include "HTTPResponse.hpp"
 
 HTTPResponse::HTTPResponse(std::string response) {
   // TODO: parse the response once we have it ;p
