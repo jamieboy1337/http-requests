@@ -5,7 +5,7 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#define PORT 80
+#define PORT 1620
 
 int main(int argc, char** argv) {
   addrinfo hints;
@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
   hints.ai_family = AF_UNSPEC;
   hints.ai_flags = AI_PASSIVE;
 
-  int success = getaddrinfo("www.google.com", NULL, &hints, &results);
+  int success = getaddrinfo("localhost", NULL, &hints, &results);
 
   if (success != 0) {
     std::cout << "oops" << std::endl;
@@ -25,7 +25,6 @@ int main(int argc, char** argv) {
 
   char shitspace[128];
 
-  std::cout << results->ai_addr << std::endl;
   std::cout << "money" << std::endl;
 
   addrinfo* res = results;
@@ -61,11 +60,7 @@ int main(int argc, char** argv) {
       close(fd);
     }
 
-
-
-    std::cout << "you're good" << std::endl;
-
-    // write(fd, (void*)"hello moto\n", 11);
+    write(fd, (void*)"hello lady\n", 11);
     close(fd);
   }
 
