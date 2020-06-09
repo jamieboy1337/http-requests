@@ -43,13 +43,16 @@ class URLParser {
   std::string path_;
   std::string query_params_;
 
+  // should always be 80 buut you never know you know :)
+  int port_;
+
   /**
    *  Reads along until we encounter an invalid character.
    * 
    *  @param input - the inputted string
    *  @param char_encontered - output parameter for the character we encountered which stopped read
    *  
-   *  @return - the number of characters read
+   *  @return - returns the number of characters checked, including the invalid char.
    */ 
   size_t ReadUntilNextInvalidChar(const char* input, char* char_encountered);
 
