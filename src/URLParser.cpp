@@ -11,7 +11,7 @@ URLParser::URLParser(const std::string& url) {
 
   char char_encountered;
 
-  path_ = "";
+  path_ = "/";
   query_params_ = "";
 
   const char* url_ptr = url.c_str();
@@ -45,7 +45,6 @@ URLParser::URLParser(const std::string& url) {
           read_size += phrase_end;
         }
         // this shoots past the next invalid character so we subtract one
-        path_.append("/");
         path_.append(std::string(url_ptr, (read_size - 1)));
         url_ptr += read_size;
         // next char is stored
