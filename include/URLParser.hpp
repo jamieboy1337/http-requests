@@ -43,7 +43,7 @@ class URLParser {
   std::string path_;
   std::string query_params_;
 
-  // should always be 80 buut you never know you know :)
+  // should always be 80 but you never know you know :)
   int port_;
 
   /**

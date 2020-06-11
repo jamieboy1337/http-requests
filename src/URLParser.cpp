@@ -1,5 +1,7 @@
 #include "URLParser.hpp"
 
+#include <iostream>
+
 URLParser::URLParser(const std::string& url) {
   // convert to a char*
   // read first for the protocol (a `://`)
@@ -9,18 +11,21 @@ URLParser::URLParser(const std::string& url) {
 
   char char_encountered;
 
+  path_ = "";
+  query_params_ = "";
+
   const char* url_ptr = url.c_str();
   size_t phrase_end = url.find("://");
   if (phrase_end != url.npos) {
     // skip past protocol (always going to use HTTP for now)
-    url_ptr += (phrase_end + 2);
+    url_ptr += (phrase_end + 3);
   } else {
     // nothing changes here yet -- no protocol so assume HTTP as usual
   }
 
   // should read full domain name
   phrase_end = ReadUntilNextInvalidChar(url_ptr, &char_encountered);
-  domain_name_ = std::string(url_ptr, --phrase_end);
+  domain_name_ = std::string(url_ptr, phrase_end - 1);
   url_ptr += phrase_end;
 
   std::string workspace;
@@ -36,11 +41,12 @@ URLParser::URLParser(const std::string& url) {
 
 
         while (char_encountered == '/') {
-          phrase_end = ReadUntilNextInvalidChar(url_ptr, &char_encountered);
+          phrase_end = ReadUntilNextInvalidChar(url_ptr + read_size, &char_encountered);
           read_size += phrase_end;
         }
         // this shoots past the next invalid character so we subtract one
-        path_ = std::string(url_ptr, (--read_size));
+        path_.append("/");
+        path_.append(std::string(url_ptr, (read_size - 1)));
         url_ptr += read_size;
         // next char is stored
         break;
@@ -48,23 +54,24 @@ URLParser::URLParser(const std::string& url) {
         // url params
         // just read until the next one
         phrase_end = ReadUntilNextInvalidChar(url_ptr, &char_encountered);
-        query_params_ = std::string(url_ptr, (--phrase_end));
+        query_params_ = std::string(url_ptr, (phrase_end - 1));
+        url_ptr += phrase_end;
         break;
       case '#':
         // fragment
         // no idea what this is doing here
         // just like ignore up until the next invalid
         phrase_end = ReadUntilNextInvalidChar(url_ptr, &char_encountered);
-        url_ptr += (phrase_end - 1);
+        url_ptr += phrase_end;
         break;
       case ':':
         // port number
         // read to an int and store somewhere
         // up until next invalid char
         phrase_end = ReadUntilNextInvalidChar(url_ptr, &char_encountered);
-        workspace = std::string(url_ptr, (--phrase_end));
-        port_ = std::stoi(workspace);
-        url_ptr += phrase_end;
+        std::cout << std::string(url_ptr, (phrase_end - 1)) << std::endl;
+        port_ = std::stoi(std::string(url_ptr, (phrase_end - 1)));
+        url_ptr += (phrase_end);
         break;
       default:
         // this shouldn't occur but if it does idk lol
