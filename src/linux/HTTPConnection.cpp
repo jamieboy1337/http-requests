@@ -1,6 +1,7 @@
 #include "HTTPConnection.hpp"
 
 #include <iostream>
+#include <sstream>
 
 #include <arpa/inet.h>
 #include <cstring>
@@ -11,7 +12,12 @@ HTTPConnection::HTTPConnection() {
 }
 
 void HTTPConnection::SetHeader(const std::string& key, const std::string& value) {
-  headers_.insert(std::make_pair(key, value));
+  std::string header_key = ToHeaderCase(key);
+  if (headers_.find(header_key) != headers_.end()) {
+    // i dont think anything is necessary here
+  }
+
+  headers_.insert(std::make_pair(header_key, value));
 }
 
 void HTTPConnection::SetResponseCallback(std::function<void(HTTPResponse)> response_func) {
@@ -19,14 +25,57 @@ void HTTPConnection::SetResponseCallback(std::function<void(HTTPResponse)> respo
 }
 
 
-void HTTPConnection::Send(const std::string& domain_name) {
-  if (ConnectToServer(domain_name)) {
+void HTTPConnection::Send(Method method, const std::string& domain_name) {
+  // do synchronous for now
+  // but move this to a thread later
+  URLParser url(domain_name);
+  if (ConnectToServer(domain_name, url)) {
     // socket is valid
     // compile http message
+    std::string message;
+    switch (method) {
+      case Method::GET:
+        message.append("GET ");
+        break;
+    }
+
+    message.append(url.GetPath());
+    message.append(" HTTP/1.1\r\n");
+    // host parameter is now required
+    // per RFC2616
+
+
+    // dont fuck me up dude
+    SetHeader("Host", url.GetDomainName());
+    // i can do gzip but im not gonna yet
+    SetHeader("Accept", "identity");
+
+    // append all headers to the request
+    for (auto header : headers_) {
+      message.append(header.first);
+      message.append(": ");
+      message.append(header.second);
+      message.append("\r\n");
+    }
+
+    // todo: allow user to set body, and parse that appropriately
+
+    // can probably send it now
+
+    // need to batch the write calls and write to the socket
+    // verify that those writes are sent successfully
+    // then one we're done we await the read
+    // and start reading
+    // once we reach the end we want to store the socket
+    // TODO: handle keep-alive sockets
+    // and then we can construct an HTTPResponse object
+    // and call our response callback with that
   }
+
+  close(socket_fd_);
 }
 
-bool HTTPConnection::ConnectToServer(const std::string& domain_name) {
+bool HTTPConnection::ConnectToServer(const std::string& domain_name, URLParser& parser) {
   addrinfo* info;
   addrinfo hints;
   memset(&hints, 0, sizeof(addrinfo));
@@ -41,7 +90,8 @@ bool HTTPConnection::ConnectToServer(const std::string& domain_name) {
   int success;
 
   // get all valid addresses
-  success = getaddrinfo(domain_name.c_str(), NULL, &hints, &info);
+  
+  success = getaddrinfo(parser.GetDomainName().c_str(), NULL, &hints, &info);
   if (success != 0) {
     // failure
     std::cout << "failed to return meaningful results from addrinfo" << std::endl;
@@ -60,10 +110,11 @@ bool HTTPConnection::ConnectToServer(const std::string& domain_name) {
     addr_size = info->ai_addrlen;
     if (info->ai_family == AF_INET) {
       sockaddr_in* address = reinterpret_cast<sockaddr_in*>(info->ai_addr);
-      address->sin_port = htons(80);
+      // urlparser
+      address->sin_port = htons(HTTP_PORT);
     } else if (info->ai_family == AF_INET6) {
       sockaddr_in6* address = reinterpret_cast<sockaddr_in6*>(info->ai_addr);
-      address->sin6_port = htons(80);
+      address->sin6_port = htons(HTTP_PORT);
     } else {
       continue;
     }
@@ -93,4 +144,20 @@ bool HTTPConnection::ConnectToServer(const std::string& domain_name) {
   freeaddrinfo(info);
 
   return false;
+}
+
+std::string HTTPConnection::ToHeaderCase(std::string header) {
+  char last = '\0';
+  std::string result;
+
+  for (char cur : header) {
+    if (last == '\0' || last == '-') {
+      cur = toupper(cur);
+    }
+
+    result.push_back(cur);
+    last = cur;
+  }
+
+  return result;
 }
