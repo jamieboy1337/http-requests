@@ -6,7 +6,8 @@
 
 // all i'm worried about for this one, i just want to get it working
 enum RequestType {
-  HTTP
+  HTTP,
+  HTTPS
 };
 
 /**
@@ -33,6 +34,11 @@ class URLParser {
   const std::string& GetPath();
 
   /**
+   *  Returns the port we are connecting to.
+   */ 
+  int GetPort();
+
+  /**
    *  Return request type associated with request
    */ 
   RequestType GetRequestType();
@@ -51,10 +57,11 @@ class URLParser {
    * 
    *  @param input - the inputted string
    *  @param char_encontered - output parameter for the character we encountered which stopped read
-   *  
+   *  @param parse_colon - parse colons (should only be taken into account following domain name) 
+   * 
    *  @return - returns the number of characters checked, including the invalid char.
    */ 
-  size_t ReadUntilNextInvalidChar(const char* input, char* char_encountered);
+  size_t ReadUntilNextInvalidChar(const char* input, char* char_encountered, bool parse_colon);
 
 };
 
