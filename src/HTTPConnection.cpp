@@ -24,7 +24,7 @@ void HTTPConnection::SetResponseCallback(std::function<void(HTTPResponse)> respo
   callback_ = response_func;
 }
 
-
+// TODO: isolate the socket calls into a class and then that will be the part that's os-dependent
 void HTTPConnection::Send(Method method, const std::string& domain_name) {
   // do synchronous for now
   // but move this to a thread later
@@ -67,7 +67,14 @@ void HTTPConnection::Send(Method method, const std::string& domain_name) {
     // then one we're done we await the read
     // and start reading
     // once we reach the end we want to store the socket
+
     // TODO: handle keep-alive sockets
+
+    int bytes_left = message.length();
+    while (bytes_left > 0) {
+      
+    }
+
     // and then we can construct an HTTPResponse object
     // and call our response callback with that
   }
