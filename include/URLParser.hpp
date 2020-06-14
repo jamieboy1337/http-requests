@@ -21,27 +21,27 @@ class URLParser {
   /**
    *  Returns a string containing the URL parameters as a string
    */ 
-  const std::string& GetQueryParameters();
+  const std::string& GetQueryParameters() const;
 
   /**
    *  Returns the domain name disjoint from the URL
    */ 
-  const std::string& GetDomainName();
+  const std::string& GetDomainName() const;
 
   /**
    *  Returns the file path requested by the user
    */ 
-  const std::string& GetPath();
+  const std::string& GetPath() const;
 
   /**
    *  Returns the port we are connecting to.
    */ 
-  int GetPort();
+  int GetPort() const;
 
   /**
    *  Return request type associated with request
    */ 
-  RequestType GetRequestType();
+  RequestType GetRequestType() const;
 
  private:
   RequestType protocol_;
@@ -61,7 +61,7 @@ class URLParser {
    * 
    *  @return - returns the number of characters checked, including the invalid char.
    */ 
-  size_t ReadUntilNextInvalidChar(const char* input, char* char_encountered, bool parse_colon);
+  size_t ReadUntilNextInvalidChar(const char* input, char* char_encountered, bool parse_colon) const;
 
 };
 

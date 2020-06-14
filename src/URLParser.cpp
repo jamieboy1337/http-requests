@@ -81,29 +81,29 @@ URLParser::URLParser(const std::string& url) {
   // should be done now -- reached the end of the URL
 }
 
-const std::string& URLParser::GetQueryParameters() {
+const std::string& URLParser::GetQueryParameters() const {
   return query_params_;
 }
 
-const std::string& URLParser::GetDomainName() {
+const std::string& URLParser::GetDomainName() const {
   return domain_name_; 
 }
 
-const std::string& URLParser::GetPath() {
+const std::string& URLParser::GetPath() const {
   return path_;
 }
 
-RequestType URLParser::GetRequestType() {
+RequestType URLParser::GetRequestType() const {
   return protocol_;
 }
 
-int URLParser::GetPort() {
+int URLParser::GetPort() const {
   return port_;
 }
 
 
 
-size_t URLParser::ReadUntilNextInvalidChar(const char* input, char* char_encountered, bool parse_colon) {
+size_t URLParser::ReadUntilNextInvalidChar(const char* input, char* char_encountered, bool parse_colon) const {
   size_t result = 0;
 
   for (;;) {
