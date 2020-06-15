@@ -36,18 +36,7 @@ HTTPSocket::HTTPSocket(const URLParser& url) {
     sockaddr_storage storage;
     int addr_size;
 
-    int port;
-
-    // port we are connected to
-    switch (url.GetRequestType()) {
-      default:
-      case HTTP:
-        port = 80;
-        break;
-      case HTTPS:
-        port = 443;
-        break;
-    }
+    int port = url.GetPort();
 
     // TODO: use functions for handling socket creation based on protocol (probably wont happen)
 
@@ -93,10 +82,55 @@ HTTPSocket::HTTPSocket(const URLParser& url) {
 }
 
 int HTTPSocket::Read(char* buf, int size) {
-  return -1;
+  int bytes_read;
+
+  int bytes_left = size;
+  
+  while (bytes_left > 0) {
+    bytes_read = read(data_->socket_fd, buf, bytes_left);
+    if (bytes_read == -1) {
+      if (errno == EINTR || errno == EAGAIN) {
+        continue;
+      }
+
+      return -1;
+    } else if (bytes_read == 0) {
+      break;
+    }
+
+    bytes_left -= bytes_read;
+    buf += bytes_read;
+  }
+
+  return (size - bytes_left);
 }
 
-void HTTPSocket::Write(char* buf, int size) {
+int HTTPSocket::Write(char* buf, int size) {
+  int bytes_written;
+  int bytes_left = size;
 
+  while (bytes_left > 0) {
+    bytes_written = write(data_->socket_fd, buf, bytes_left);
+    if (bytes_written == -1) {
+      if (errno == EINTR || errno == EAGAIN) {
+        continue;
+      }
+
+      return -1;
+    } else if (bytes_written == 0) {
+      break;
+    }
+    
+    bytes_left -= bytes_written;
+    buf += bytes_written;
+  }
+
+  return (size - bytes_left);
+}
+
+
+
+HTTPSocket::~HTTPSocket() {
+  close(data_->socket_fd);
 }
 
