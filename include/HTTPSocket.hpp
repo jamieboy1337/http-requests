@@ -31,8 +31,10 @@ class HTTPSocket {
    *  Write `size` characters from the buffer and into the socket.
    *  @param buf - The location we are writing to.
    *  @param size - The number of bytes we are trying to write to the buffer.
+   * 
+   *  @return - Number of bytes which could be written
    */ 
-  void Write(char* buf, int size);
+  int Write(char* buf, int size);
 
 
   ~HTTPSocket();
