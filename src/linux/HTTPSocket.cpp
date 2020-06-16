@@ -21,9 +21,9 @@ HTTPSocket::HTTPSocket(const URLParser& url) {
   
   int success;
 
-  hints.ai_socktype = SOCK_STREAM;  // stream vs. datagram
   hints.ai_family = AF_UNSPEC;      // v4 / v6
   hints.ai_flags = AI_PASSIVE;      // wildcard for ip
+  hints.ai_socktype = SOCK_STREAM;  // stream vs. datagram
 
   success = getaddrinfo(url.GetDomainName().c_str(), NULL, &hints, &info);
 
@@ -43,7 +43,7 @@ HTTPSocket::HTTPSocket(const URLParser& url) {
     do {
       addr_size = infoptr->ai_addrlen;
       // set port appropriately
-      switch (addr_size) {
+      switch (infoptr->ai_family) {
         case AF_INET:
           sockaddr_in* address = reinterpret_cast<sockaddr_in*>(infoptr->ai_addr);
           address->sin_port = htons(port);
@@ -82,6 +82,10 @@ HTTPSocket::HTTPSocket(const URLParser& url) {
 }
 
 int HTTPSocket::Read(char* buf, int size) {
+  if (!is_connected_) {
+    // not connected
+    return -1;
+  }
   int bytes_read;
 
   int bytes_left = size;
@@ -106,6 +110,10 @@ int HTTPSocket::Read(char* buf, int size) {
 }
 
 int HTTPSocket::Write(char* buf, int size) {
+  if (!is_connected_) {
+    return -1;
+  }
+
   int bytes_written;
   int bytes_left = size;
 
