@@ -42,7 +42,8 @@ class TestListener {
 
  private:
   char* buffer_;  // internal buffer for storing the message :)
-
+  int host_fd_;   // fd for the local socket
+  bool is_listening_;  // whether we've got set up properly
 };
 
 #endif  // TEST_LISTENER_H_
