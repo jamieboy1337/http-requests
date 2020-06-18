@@ -1,8 +1,12 @@
 #ifndef TEST_LISTENER_H_
 #define TEST_LISTENER_H_
 
+#include <atomic>
+#include <mutex>
+
 /**
  *  Simple listener class which spins up and down
+ *  Specifically for testing socket functionality locally
  */ 
 class TestListener {
 
@@ -27,9 +31,10 @@ class TestListener {
   void Listen(int port);
 
   /**
-   *  Spins until a message is received.
+   *  Spins until a message is received, then outputs that message to the internal buffer
+   *  and closes the connected socket.
    */ 
-  void Wait();
+  void Accept();
 
   /**
    *  Returns the message if it has been successfully processed
@@ -44,6 +49,7 @@ class TestListener {
   char* buffer_;  // internal buffer for storing the message :)
   int host_fd_;   // fd for the local socket
   bool is_listening_;  // whether we've got set up properly
+  const int buffer_size_;
 };
 
 #endif  // TEST_LISTENER_H_
