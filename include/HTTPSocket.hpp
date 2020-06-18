@@ -13,6 +13,12 @@ struct SocketData;
  */ 
 class HTTPSocket {
  public:
+
+  /**
+   *  Constructs a completely disconnected socket.
+   */ 
+  HTTPSocket();
+
   /**
    *  Constructs a new HTTPSocket from a parsed URL and connects to the specified resource.
    *  @param url - A parsed URL representing the address we are connecting to.
@@ -27,7 +33,7 @@ class HTTPSocket {
   HTTPSocket(int fd);
 
   /**
-   *  Read `size` characters from the buffer and into the socket.
+   *  Read `size` characters from the socket into the buffer.
    *  @param buf - The data we are reading.
    *  @param size - The number of characters we are reading.
    * 
@@ -36,7 +42,7 @@ class HTTPSocket {
   int Read(char* buf, int size);
 
   /**
-   *  Write `size` characters from the buffer and into the socket.
+   *  Attempts to read `size` characters from the buffer into the socket.
    *  @param buf - The location we are writing to.
    *  @param size - The number of bytes we are trying to write to the buffer.
    * 
@@ -48,6 +54,7 @@ class HTTPSocket {
   ~HTTPSocket();
   HTTPSocket(const HTTPSocket& rhs) = delete;
   HTTPSocket& operator=(const HTTPSocket& rhs) = delete;
+  HTTPSocket& operator=(HTTPSocket&& rhs);
 
  private:
   // pimpl
