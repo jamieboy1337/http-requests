@@ -9,6 +9,10 @@ enable_testing()
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
+set(SOURCES ${SRC_DIR}/linux/HTTPSocket.cpp
+            ${SRC_DIR}/URLParser.cpp)
 
 
 
@@ -39,14 +43,25 @@ if(${COMPILE_TESTS})
                   ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
                   EXCLUDE_FROM_ALL)
 
+  
   ## INDIVIDUAL TEST ##
-  set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
   # test files
 
+  ## TEST LISTENER ##
+  add_library(TestListener ${TEST_DIR}/linux/TestListener.cpp)
+  target_include_directories(TestListener PRIVATE ${INC_DIR})
+                  
   add_executable(URLParser_test ${SRC_DIR}/URLParser.cpp ${TEST_DIR}/URLParser_test.cpp)
   target_include_directories(URLParser_test PRIVATE ${INC_DIR})
   target_link_libraries(URLParser_test gtest_main)
   add_test(NAME URLParserTest COMMAND URLParser_test)
+
+  add_executable(HTTPSocket_test ${SOURCES} ${TEST_DIR}/HTTPSocket_test.cpp)
+  target_include_directories(HTTPSocket_test PRIVATE ${INC_DIR})
+  target_link_libraries(HTTPSocket_test TestListener gtest_main)
+  add_test(NAME HTTPSocketTest COMMAND HTTPSocket_test)
+
+  # test socket
 
 endif()
 

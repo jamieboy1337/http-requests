@@ -42,7 +42,7 @@ class HTTPSocket {
    * 
    *  @return - Number of bytes which could be written, or -1 in the case of an error
    */ 
-  int Write(char* buf, int size);
+  int Write(const char* buf, int size);
 
 
   ~HTTPSocket();

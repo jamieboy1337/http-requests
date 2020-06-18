@@ -9,7 +9,7 @@
  *  Specifically for testing socket functionality locally
  */ 
 class TestListener {
-
+ public:
   // constructor does whatever
   // listen call actually gets the message
   // perform this on some separate thread so we can actually get the message
