@@ -2,7 +2,7 @@
 #include "URLParser.hpp"
 
 
-TEST(URLParserTest, CreateURL) {
+TEST(URLParserTests, CreateURL) {
   URLParser parser("http://google.com");
   // just ensure it doesn't crash lol
   ASSERT_EQ(parser.GetDomainName(), "google.com");
@@ -12,7 +12,7 @@ TEST(URLParserTest, CreateURL) {
 
 // create test to verify several URLs
 
-TEST(URLParserTest, CheckMultipleURLs) {
+TEST(URLParserTests, CheckMultipleURLs) {
   URLParser twitter_test("https://twitter.com/home");
   ASSERT_EQ(twitter_test.GetDomainName(), "twitter.com");
   ASSERT_EQ(twitter_test.GetPath(), "/home");
@@ -48,4 +48,11 @@ TEST(URLParserTest, CheckMultipleURLs) {
   ASSERT_EQ(local_test.GetPath(), "/themonkey/livetweets.html");
   ASSERT_EQ(local_test.GetQueryParameters(), "");
   ASSERT_EQ(local_test.GetPort(), 3000);
+
+  // test IP address
+  URLParser ip_test("127.0.0.1:120");
+  ASSERT_EQ(ip_test.GetDomainName(), "127.0.0.1");
+  ASSERT_EQ(ip_test.GetPath(), "/");
+  ASSERT_EQ(ip_test.GetQueryParameters(), "");
+  ASSERT_EQ(ip_test.GetPort(), 120);
 }
