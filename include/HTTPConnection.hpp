@@ -1,6 +1,8 @@
 #include "HTTPResponse.hpp"
 #include "URLParser.hpp"
 
+#include "HTTPSocket.hpp"
+
 #include <functional>
 #include <unordered_map>
 #include <thread>
@@ -51,9 +53,11 @@ class HTTPConnection {
 
  private:
   std::unordered_map<std::string, std::string> headers_;
-  int socket_fd_;
+  HTTPSocket socket_;
   std::thread socket_thread_;
   std::function<void(HTTPResponse)> callback_;
+
+  static const char* const delimiter;
 
   /**
    *  Attempt to connect to the given domain name.
