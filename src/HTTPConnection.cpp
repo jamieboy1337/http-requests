@@ -24,7 +24,6 @@ void HTTPConnection::SetResponseCallback(std::function<void(HTTPResponse)> respo
   callback_ = response_func;
 }
 
-// TODO: isolate the socket calls into a class and then that will be the part that's os-dependent
 void HTTPConnection::Send(Method method, const std::string& domain_name) {
   // do synchronous for now
   // but move this to a thread later
@@ -58,7 +57,7 @@ void HTTPConnection::Send(Method method, const std::string& domain_name) {
       message.append("\r\n");
     }
 
-    // todo: allow user to set body, and parse that appropriately
+    // TODO: allow user to set body, and parse that appropriately
 
     // can probably send it now
 
@@ -83,6 +82,8 @@ void HTTPConnection::Send(Method method, const std::string& domain_name) {
 }
 
 bool HTTPConnection::ConnectToServer(const std::string& domain_name, URLParser& parser) {
+  
+  // TODO: Swap Linux Sockets for the HTTPSocket class
   addrinfo* info;
   addrinfo hints;
   memset(&hints, 0, sizeof(addrinfo));

@@ -141,8 +141,6 @@ int HTTPSocket::Write(char* buf, int size) {
   return (size - bytes_left);
 }
 
-
-
 HTTPSocket::~HTTPSocket() {
   close(data_->socket_fd);
 }

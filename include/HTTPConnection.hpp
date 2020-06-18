@@ -55,9 +55,6 @@ class HTTPConnection {
   std::thread socket_thread_;
   std::function<void(HTTPResponse)> callback_;
 
-  // TODO: need a lock on the class variables -- callback will run in separate thread most likely
-  
-
   /**
    *  Attempt to connect to the given domain name.
    *  Returns true if successful, false otherwise.
