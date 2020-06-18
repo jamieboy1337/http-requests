@@ -67,3 +67,7 @@ const char* TestListener::GetMessage() {
   return nullptr;
 }
 
+TestListener::~TestListener() {
+  delete[] buffer_;
+}
+
