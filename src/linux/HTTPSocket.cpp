@@ -11,6 +11,11 @@ struct SocketData {
   int socket_fd;
 };
 
+HTTPSocket::HTTPSocket() {
+  data_ = nullptr;
+  is_connected_ = false;
+}
+
 HTTPSocket::HTTPSocket(const URLParser& url) {
   data_ = std::make_unique<SocketData>();
   is_connected_ = false;
@@ -43,17 +48,14 @@ HTTPSocket::HTTPSocket(const URLParser& url) {
     do {
       addr_size = infoptr->ai_addrlen;
       // set port appropriately
-      switch (infoptr->ai_family) {
-        case AF_INET:
+      if (infoptr->ai_family == AF_INET) {
           sockaddr_in* address = reinterpret_cast<sockaddr_in*>(infoptr->ai_addr);
           address->sin_port = htons(port);
-          break;
-        case AF_INET6:
+      } else if (infoptr->ai_family == AF_INET6) {
           sockaddr_in6* address = reinterpret_cast<sockaddr_in6*>(infoptr->ai_addr);
-          address->sin_port = htons(port);
-          break;
-        default:
-          continue;
+          address->sin6_port = htons(port);
+      } else {
+        continue;
       }
       // copy from addrinfo (which will be freed) to storage
       // this is not necessary :)
@@ -75,15 +77,23 @@ HTTPSocket::HTTPSocket(const URLParser& url) {
       
     } while ((infoptr = infoptr->ai_next) != NULL);
 
-    freeaddrinfo(info);
+    if (infoptr == NULL) {
+      freeaddrinfo(info);
+    } 
 
   }
 
 }
 
 HTTPSocket::HTTPSocket(int fd) {
+  data_ = std::make_unique<SocketData>();
   data_->socket_fd = fd;
   is_connected_ = true;
+}
+
+HTTPSocket& HTTPSocket::operator=(HTTPSocket&& rhs) {
+  data_->socket_fd = rhs.data_->socket_fd;
+  is_connected_ = rhs.is_connected_;
 }
 
 int HTTPSocket::Read(char* buf, int size) {
@@ -91,54 +101,34 @@ int HTTPSocket::Read(char* buf, int size) {
     // not connected
     return -1;
   }
-  int bytes_read;
-
-  int bytes_left = size;
   
-  while (bytes_left > 0) {
-    bytes_read = read(data_->socket_fd, buf, bytes_left);
-    if (bytes_read == -1) {
-      if (errno == EINTR || errno == EAGAIN) {
-        continue;
-      }
-
-      return -1;
-    } else if (bytes_read == 0) {
-      break;
+  int read_result = read(data_->socket_fd, buf, size);
+  while (read_result == -1) {
+    if (errno == EINTR) {
+      read_result = read(data_->socket_fd, buf, size);
     }
 
-    bytes_left -= bytes_read;
-    buf += bytes_read;
+    return -1;
   }
 
-  return (size - bytes_left);
+  return read_result;
 }
 
-int HTTPSocket::Write(char* buf, int size) {
+int HTTPSocket::Write(const char* buf, int size) {
   if (!is_connected_) {
     return -1;
   }
 
-  int bytes_written;
-  int bytes_left = size;
-
-  while (bytes_left > 0) {
-    bytes_written = write(data_->socket_fd, buf, bytes_left);
-    if (bytes_written == -1) {
-      if (errno == EINTR || errno == EAGAIN) {
-        continue;
-      }
-
-      return -1;
-    } else if (bytes_written == 0) {
-      break;
+  int write_result = write(data_->socket_fd, buf, size);
+  while (write_result == -1) {
+    if (errno == EINTR) {
+      write_result = write(data_->socket_fd, buf, size);
     }
-    
-    bytes_left -= bytes_written;
-    buf += bytes_written;
+
+    return -1;
   }
 
-  return (size - bytes_left);
+  return write_result;
 }
 
 HTTPSocket::~HTTPSocket() {
