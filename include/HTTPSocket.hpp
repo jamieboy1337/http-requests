@@ -18,12 +18,20 @@ class HTTPSocket {
    *  @param url - A parsed URL representing the address we are connecting to.
    */ 
   HTTPSocket(const URLParser& url);
+
+  /**
+   *  Constructs a new HTTPSocket from a preexisting file descriptor.
+   *  New HTTPSocket takes ownership of the descriptor.
+   *  Assumes that socket is valid.
+   */ 
+  HTTPSocket(int fd);
+
   /**
    *  Read `size` characters from the buffer and into the socket.
    *  @param buf - The data we are reading.
    *  @param size - The number of characters we are reading.
    * 
-   *  @return - number of characters which could be read.
+   *  @return - number of characters which could be read, or -1 in the case of an error
    */ 
   int Read(char* buf, int size);
 
@@ -32,7 +40,7 @@ class HTTPSocket {
    *  @param buf - The location we are writing to.
    *  @param size - The number of bytes we are trying to write to the buffer.
    * 
-   *  @return - Number of bytes which could be written
+   *  @return - Number of bytes which could be written, or -1 in the case of an error
    */ 
   int Write(char* buf, int size);
 

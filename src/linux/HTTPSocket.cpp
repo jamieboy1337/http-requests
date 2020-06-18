@@ -81,6 +81,11 @@ HTTPSocket::HTTPSocket(const URLParser& url) {
 
 }
 
+HTTPSocket::HTTPSocket(int fd) {
+  data_->socket_fd = fd;
+  is_connected_ = true;
+}
+
 int HTTPSocket::Read(char* buf, int size) {
   if (!is_connected_) {
     // not connected
