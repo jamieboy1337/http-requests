@@ -60,12 +60,6 @@ class HTTPConnection {
   static const char* const delimiter;
 
   /**
-   *  Attempt to connect to the given domain name.
-   *  Returns true if successful, false otherwise.
-   */ 
-  bool ConnectToServer(const std::string& domain_name, URLParser& parser);
-
-  /**
    *  Converts an inputted header to header-case -- that is, the first character is capitalized
    *  and characters following dashes are capitalized as well.
    */ 
