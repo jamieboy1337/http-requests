@@ -17,10 +17,10 @@ enum Method {
 };
 
 
-class HTTPConnection {
+class HTTPRequest {
  public:
 
-  HTTPConnection();
+  HTTPRequest();
 
   /**
    *  Set a given HTTP header on the connection

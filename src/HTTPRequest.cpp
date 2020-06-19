@@ -1,4 +1,4 @@
-#include "HTTPConnection.hpp"
+#include "HTTPRequest.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -8,13 +8,13 @@
 #include <netdb.h>
 #include <unistd.h>
 
-const char* const HTTPConnection::delimiter = "\r\n\r\n";
+const char* const HTTPRequest::delimiter = "\r\n\r\n";
 
-HTTPConnection::HTTPConnection() {
+HTTPRequest::HTTPRequest() {
   
 }
 
-void HTTPConnection::SetHeader(const std::string& key, const std::string& value) {
+void HTTPRequest::SetHeader(const std::string& key, const std::string& value) {
   std::string header_key = ToHeaderCase(key);
   if (headers_.find(header_key) != headers_.end()) {
     // i dont think anything is necessary here
@@ -23,11 +23,11 @@ void HTTPConnection::SetHeader(const std::string& key, const std::string& value)
   headers_.insert(std::make_pair(header_key, value));
 }
 
-void HTTPConnection::SetResponseCallback(std::function<void(HTTPResponse)> response_func) {
+void HTTPRequest::SetResponseCallback(std::function<void(HTTPResponse)> response_func) {
   callback_ = response_func;
 }
 
-void HTTPConnection::Send(Method method, const std::string& domain_name) {
+void HTTPRequest::Send(Method method, const std::string& domain_name) {
   // do synchronous for now
   // but move this to a thread later
   URLParser url(domain_name);
