@@ -19,17 +19,20 @@ class HTTPResponse {
   /**
    *  Creates an HTTP response from a parsed response string.
    */ 
-  HTTPResponse(std::string response);
+  HTTPResponse(std::string header);
 
   /**
    *  Fetch a header from the connection
    */ 
-  std::string GetHeader(const std::string& key);
-  const std::string& GetBody();
+  std::string GetHeader(const std::string& key) const;
+
+  /**
+   *  Body of the response message
+   */ 
+  std::string body_;
 
  private:
   std::unordered_map<std::string, std::string> headers_;
-  std::string body_;
   HTTPMethod method_;
 };
 
