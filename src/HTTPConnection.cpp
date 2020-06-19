@@ -93,23 +93,36 @@ void HTTPConnection::Send(Method method, const std::string& domain_name) {
   // allocate some space to write to
   std::string response;
   char* buffer = new char[1024];
+  char* body_start;
   int bytes_read = 0;
 
   size_t header_length;
 
   for (;;) {
+    // TODO: 
     bytes_processed = socket_.Read(buffer, 1024);
     if (bytes_processed != -1) {
       response.append(buffer, bytes_processed);
-      header_length = response.find(delimiter, bytes_read);
+      // could have a situation where the EOF is spread across two reads
+      header_length = response.find(delimiter, std::max(bytes_read - 4, 0));
       if (header_length != response.npos) {
         // we've found our delimiter.
+        // store the part of our buffer which we want to retain
+        // header_length is position of it
+        // bytes_read is number of bytes read thus far
+        body_start = buffer + (header_length - bytes_read + 4);
         break;
+        
       }
     }
+    
+    bytes_read += bytes_processed;
   }
 
   // parse header
+  // do something to retain the current state of the buffer
+
+  HTTPResponse(response.substr(0, header_length));
 
 
 
