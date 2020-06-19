@@ -99,7 +99,6 @@ void HTTPRequest::Send(Method method, const std::string& domain_name) {
   size_t header_length;
 
   for (;;) {
-    // TODO: 
     bytes_processed = socket_.Read(buffer, 1024);
     if (bytes_processed != -1) {
       response.append(buffer, bytes_processed);
@@ -107,9 +106,6 @@ void HTTPRequest::Send(Method method, const std::string& domain_name) {
       header_length = response.find(delimiter, std::max(bytes_read - 4, 0));
       if (header_length != response.npos) {
         // we've found our delimiter.
-        // store the part of our buffer which we want to retain
-        // header_length is position of it
-        // bytes_read is number of bytes read thus far
         body_start = buffer + (header_length - bytes_read + 4);
         break;
         
