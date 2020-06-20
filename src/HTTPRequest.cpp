@@ -68,6 +68,8 @@ void HTTPRequest::Send(Method method, const std::string& domain_name) {
   message.append("\r\n");
 
   // TODO: allow user to set body, and parse that appropriately
+  // in doing so there are particular headers we should set
+  // handle those appropriately
 
   // add a content length header to deal with it
 
