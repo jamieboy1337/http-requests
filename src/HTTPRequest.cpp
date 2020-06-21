@@ -16,10 +16,6 @@ HTTPRequest::HTTPRequest() {
 
 void HTTPRequest::SetHeader(const std::string& key, const std::string& value) {
   std::string header_key = ToHeaderCase(key);
-  if (headers_.find(header_key) != headers_.end()) {
-    // i dont think anything is necessary here
-  }
-
   headers_.insert(std::make_pair(header_key, value));
 }
 
@@ -45,11 +41,7 @@ void HTTPRequest::Send(Method method, const std::string& domain_name) {
 
   message.append(url.GetPath());
   message.append(" HTTP/1.1\r\n");
-  // host parameter is now required
-  // per RFC2616
 
-
-  // dont fuck me up dude
   SetHeader("Host", url.GetDomainName());
   // i can do gzip but im not gonna yet
   SetHeader("Accept", "identity");
@@ -78,7 +70,6 @@ void HTTPRequest::Send(Method method, const std::string& domain_name) {
   int bytes_left = message.length();
   int bytes_processed;
   const char* c_message = message.c_str();
-  // get a response
   while (bytes_left > 0) {
     bytes_processed = socket_.Write(c_message, bytes_left);
     if (bytes_processed == -1) {
@@ -90,9 +81,6 @@ void HTTPRequest::Send(Method method, const std::string& domain_name) {
     c_message += bytes_processed;
   }
 
-  // wait for write to return
-
-  // allocate some space to write to
   std::string response;
   char* buffer = new char[1024];
   char* body_start;
@@ -119,6 +107,9 @@ void HTTPRequest::Send(Method method, const std::string& domain_name) {
 
   // parse header
   // do something to retain the current state of the buffer
+
+  // for debugging purposes
+  std::cout << response.substr(0, header_length) << std::endl;
 
   HTTPResponse(response.substr(0, header_length));
 
