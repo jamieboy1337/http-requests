@@ -22,7 +22,8 @@ class HTTPResponse {
   HTTPResponse(std::string header);
 
   /**
-   *  Fetch a header from the connection
+   *  Fetch a header from the response
+   *  Returns empty string if not found
    */ 
   std::string GetHeader(const std::string& key) const;
 
@@ -34,6 +35,12 @@ class HTTPResponse {
  private:
   std::unordered_map<std::string, std::string> headers_;
   HTTPMethod method_;
+
+  /**
+   *  Trims white space in string.
+   */ 
+  std::string& Trim(std::string& target);
+
 };
 
 #endif // CONNECTION_H_
