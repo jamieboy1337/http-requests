@@ -23,9 +23,25 @@ HTTPResponse::HTTPResponse(std::string header) {
 
   int colon_pos;
 
+  // ver SP code SP reason (multiple sp)
+  // then the headers
+
+  std::string status_line = header.substr(0, header.find("\r\n"));
+  // get response type
+  start_pos = status_line.find(" ") + 1;
+  end_pos = status_line.find(" ");
+  response_code_ = std::stoi(status_line.substr(start_pos, end_pos));
+  response_desc_ = status_line.substr(end_pos + 1);
+  start_pos = status_line.length() + 2;
+
   while ((end_pos = header.find("\r\n", start_pos)) != header.npos) {
     header_entry = header.substr(start_pos, end_pos);
+    start_pos = (end_pos + 2);
     colon_pos = header_entry.find(":");
+    if (colon_pos == header.npos) {
+      // not part of header
+      continue;
+    }
     header_key = header_entry.substr(0, colon_pos);
     header_value = header_entry.substr(colon_pos + 1);
 
@@ -33,6 +49,7 @@ HTTPResponse::HTTPResponse(std::string header) {
     Trim(header_value);
 
     headers_.insert(std::pair<std::string, std::string>(header_key, header_value));
+    // skip \r\n
   }
 }
 
@@ -42,6 +59,14 @@ std::string HTTPResponse::GetHeader(const std::string& key) const {
   }
 
   return "";
+}
+
+int HTTPResponse::GetResponseCode() {
+  return response_code_;
+}
+
+const std::string& HTTPResponse::GetResponseDescription() {
+  return response_desc_;
 }
 
 
