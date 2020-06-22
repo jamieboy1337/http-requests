@@ -28,6 +28,16 @@ class HTTPResponse {
   std::string GetHeader(const std::string& key) const;
 
   /**
+   *  @return the response code associated with the request
+   */ 
+  int GetResponseCode();
+
+  /**
+   *  @return the response description as a string as provided by response
+   */ 
+  const std::string& GetResponseDescription();
+
+  /**
    *  Body of the response message
    */ 
   std::string body_;
@@ -35,6 +45,9 @@ class HTTPResponse {
  private:
   std::unordered_map<std::string, std::string> headers_;
   HTTPMethod method_;
+
+  int response_code_;
+  std::string response_desc_;
 
   /**
    *  Trims white space in string.
